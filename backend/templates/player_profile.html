@@ -17,7 +17,7 @@
             <h2>{{ player.first_name }} {{ player.last_name }}</h2>
             <p class="text-muted mb-0">Age: {{ player.age }}</p>
         </div>
-        <a href="{{ url_for('index') }}" class="btn btn-outline-primary">← Back to Home</a>
+        <a href="{{ url_for('players_page') }}" class="btn btn-outline-primary">← Back to Home</a>
     </div>
 
     <hr>
@@ -58,6 +58,7 @@
                             <th>Score</th>
                             <th>Unit</th>
                             <th>Performance</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -100,6 +101,9 @@
                                         <span>Avg: {{ "%.2f"|format(avg_val) }}</span>
                                         <span>Best: {{ "%.2f"|format(max_val) }}</span>
                                     </div>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('edit_result', score_id=result.score_id) }}" class="btn btn-sm btn-warning">Edit Score</a>
                                 </td>
                             </tr>
                         {% endfor %}

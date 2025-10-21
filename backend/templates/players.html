@@ -31,7 +31,11 @@
             {% for data in players %}
                 <tr>
                     <td>{{ data.player_id }}</td>
-                    <td>{{ data.first_name }}</td>
+                    <td>
+                        <a href="{{ url_for('player_profile', player_id=data.player_id) }}" class="text-decoration-none">
+                            {{ data.first_name }}
+                        </a>
+                    </td>
                     <td>
                         <a href="{{ url_for('player_profile', player_id=data.player_id) }}" class="text-decoration-none">
                             {{ data.last_name }}

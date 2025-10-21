@@ -22,6 +22,10 @@
             <label class="form-label">Score</label>
             <input type="number" step="any" class="form-control" name="score" value="{{ result.score }}" required>
         </div>
+        <div class="mb-3">
+            <label class="form-label">Goal</label>
+            <input type="number" step="any" name="goal" class="form-control" value="{{ result.goal or '' }}">
+        </div>
         <button type="submit" class="btn btn-success">Save</button>
         <a href="{{ url_for('player_profile', player_id=result.player_id) }}" class="btn btn-secondary">Cancel</a>
     </form>

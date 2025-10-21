@@ -17,7 +17,7 @@
             <h2>{{ player.first_name }} {{ player.last_name }}</h2>
             <p class="text-muted mb-0">Age: {{ player.age }}</p>
         </div>
-        <a href="{{ url_for('players_page') }}" class="btn btn-outline-primary">← Back to Home</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">← Back to Home</a>
     </div>
 
     <hr>
@@ -56,7 +56,7 @@
                         <tr>
                             <th>Test</th>
                             <th>Score</th>
-                            <th>Unit</th>
+                            <th>Goal</th>
                             <th>Performance</th>
                             <th>Actions</th>
                         </tr>
@@ -68,42 +68,88 @@
                             {% set max_val = stats.best %}
                             {% set avg_val = stats.avg %}
                             {% set player_val = result.score %}
+                            
                             {% if max_val != min_val %}
-                                {% set player_pos = ((player_val - min_val) / (max_val - min_val)) * 100 %}
-                                {% set avg_pos = ((avg_val - min_val) / (max_val - min_val)) * 100 %}
+                                {% if test.better_score == 'low' %}
+                                    {# Flip direction for "low is better" #}
+                                    {% set player_pos = (1 - ((player_val - min_val) / (max_val - min_val))) * 100 %}
+                                    {% set avg_pos = (1 - ((avg_val - min_val) / (max_val - min_val))) * 100 %}
+                                {% else %}
+                                    {% set player_pos = ((player_val - min_val) / (max_val - min_val)) * 100 %}
+                                    {% set avg_pos = ((avg_val - min_val) / (max_val - min_val)) * 100 %}
+                                {% endif %}
                             {% else %}
                                 {% set player_pos = 50 %}
                                 {% set avg_pos = 50 %}
                             {% endif %}
+                        
+                        
 
                             <tr>
                                 <td>{{ test.test_name }}</td>
                                 <td>{{ result.score }}</td>
-                                <td>{{ test.unit }}</td>
+                                <td>
+                                 
+                                        {% if result.goal %}
+                                          {{ result.goal }}
+                                        {% else %}
+                                          <form method="POST" action="{{ url_for('set_goal', score_id=result.score_id) }}" class="d-inline">
+                                            <input type="number" name="goal" placeholder="Set goal" class="form-control form-control-sm d-inline-block w-auto">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                                          </form>
+                                        {% endif %}
+                        
+                                </td>
                                 <td>
                                     <div class="position-relative bg-light rounded" style="height: 20px;">
-                                        <!-- Range bar -->
+                                        <!-- Background range -->
                                         <div class="progress" style="height: 20px;">
                                             <div class="progress-bar bg-success" role="progressbar" 
                                                  style="width: 100%; opacity: 0.2;"></div>
                                         </div>
-
+                                
                                         <!-- Average marker -->
                                         <div class="position-absolute top-0" 
-                                             style="left: {{ avg_pos }}%; height: 20px; width: 2px; background: orange;"></div>
-
+                                             style="left: {{ avg_pos }}%; height: 20px; width: 2px; background: orange;"
+                                             title="Average"></div>
+                                
                                         <!-- Player marker -->
                                         <div class="position-absolute top-0" 
-                                             style="left: {{ player_pos }}%; height: 20px; width: 3px; background: #0d6efd;"></div>
+                                             style="left: {{ player_pos }}%; height: 20px; width: 3px; background: #0d6efd;"
+                                             title="Player"></div>
+                                
+                                        <!-- Goal marker (only if a goal exists) -->
+                                        {% if result.goal is not none %}
+                                            {% if max_val != min_val %}
+                                                {% if test.better_score == 'low' %}
+                                                    {% set goal_pos = (1 - ((result.goal - min_val) / (max_val - min_val))) * 100 %}
+                                                {% else %}
+                                                    {% set goal_pos = ((result.goal - min_val) / (max_val - min_val)) * 100 %}
+                                                {% endif %}
+                                            {% else %}
+                                                {% set goal_pos = 50 %}
+                                            {% endif %}
+                                            <div class="position-absolute top-0" 
+                                                 style="left: {{ goal_pos }}%; height: 20px; width: 2px; background: #28a745;"
+                                                 title="Goal"></div>
+                                        {% endif %}
                                     </div>
+                                
                                     <div class="d-flex justify-content-between mt-1" style="font-size: 0.8em;">
-                                        <span>Worst: {{ "%.2f"|format(min_val) }}</span>
-                                        <span>Avg: {{ "%.2f"|format(avg_val) }}</span>
-                                        <span>Best: {{ "%.2f"|format(max_val) }}</span>
+                                        {% if test.better_score == 'low' %}
+                                            <span>Worst: {{ "%.2f"|format(max_val) }}</span>
+                                            <span>Avg: {{ "%.2f"|format(avg_val) }}</span>
+                                            <span>Best: {{ "%.2f"|format(min_val) }}</span>
+                                        {% else %}
+                                            <span>Worst: {{ "%.2f"|format(min_val) }}</span>
+                                            <span>Avg: {{ "%.2f"|format(avg_val) }}</span>
+                                            <span>Best: {{ "%.2f"|format(max_val) }}</span>
+                                        {% endif %}
                                     </div>
                                 </td>
+                                
                                 <td>
-                                    <a href="{{ url_for('edit_result', score_id=result.score_id) }}" class="btn btn-sm btn-warning">Edit Score</a>
+                                    <a href="{{ url_for('edit_result', score_id=result.score_id) }}" class="btn btn-sm btn-warning">Edit Result</a>
                                 </td>
                             </tr>
                         {% endfor %}

@@ -51,10 +51,10 @@ class TestResult(db.Model):
     test_id = db.Column(db.Integer, db.ForeignKey('test.test_id'), nullable=False)
     session_id = db.Column(db.Integer, db.ForeignKey('test_session.session_id'), nullable=False)
     score = db.Column(db.Float, nullable=True)
-
+    goal = db.Column(db.Float, nullable=True)
     player = db.relationship('Player', backref='scores')
     test = db.relationship('Test', backref='scores')
     session = db.relationship('TestSession', backref='results')
 
     def __repr__(self):
-        return f"<TestResult player_id={self.player_id}, test_id={self.test_id}, session={self.session_id}, score={self.score}>"
+        return f"<TestResult player_id={self.player_id}, test_id={self.test_id}, session={self.session_id}, score={self.score}, goal={self.goal}>"

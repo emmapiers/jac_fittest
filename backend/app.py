@@ -19,6 +19,7 @@ app.secret_key = 'supersecret'
 # Creating an SQLAlchemy instance
 db.init_app(app)
 
+
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -38,11 +39,17 @@ def coach_only(f):
         return f(*args, **kwargs)
     return wrapper
 
+@app.context_processor
+def inject_all_players():
+    all_players = Player.query.order_by(Player.last_name).all()
+    return dict(all_players=all_players)
+
 @app.route('/dashboard')
 @login_required
 @coach_only
 def dashboard():
-    return render_template("dashboard.html")
+    all_players = Player.query.order_by(Player.last_name).all()
+    return render_template("dashboard.html", all_players=all_players)
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -84,7 +91,7 @@ def index():
         return redirect(url_for("login"))
     players = Player.query.all()
     tests = Test.query.all()
-    return render_template('index.html', players=players, tests=tests)
+    return render_template('dashboard.html', players=players, tests=tests)
 
 # ---- PLAYER ROUTES ----
 @app.route('/dashboard/players')
@@ -251,10 +258,13 @@ def edit_result(score_id):
 
     if request.method == "POST":
         new_score = request.form.get("score")
+        new_goal = request.form.get("goal")
         if new_score:
             result.score = float(new_score)
-            db.session.commit()
-            return redirect(url_for('player_profile', player_id=result.player_id))
+        if new_goal:
+            result.goal = float(new_goal)
+        db.session.commit()
+        return redirect(url_for('player_profile', player_id=result.player_id))
 
     return render_template("edit_result.html", result=result)
 
@@ -485,6 +495,21 @@ def results_page():
         order=order,
     )
 
+@app.route('/set_goal/<int:score_id>', methods=['GET', 'POST'])
+def set_goal(score_id):
+    result = TestResult.query.get_or_404(score_id)
+
+    if request.method == 'POST':
+        try:
+            goal_value = float(request.form['goal'])
+            result.goal = goal_value
+            db.session.commit()
+            flash('Goal updated successfully!', 'success')
+            return redirect(url_for('player_profile', player_id=result.player_id))
+        except ValueError:
+            flash('Please enter a valid number for the goal.', 'danger')
+
+    return render_template('set_goal.html', result=result)
 
 if __name__ == '__main__':
     with app.app_context():

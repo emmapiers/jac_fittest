@@ -71,7 +71,7 @@
                             <a href="{{ url_for('results_page', session_id=selected_session.session_id, test_id=selected_test.test_id, sort_by='score', order='asc' if sort_by == 'score' and order == 'desc' else 'desc') }}"
                                class="text-white text-decoration-none">Score</a>
                         </th>
-                        <th>Unit</th>
+                        <th>Goal</th>
                     </tr>
                 </thead>
                 
@@ -82,7 +82,7 @@
                         <td>{{ result.player.first_name }}</td>
                         <td>{{ result.player.last_name }}</td>
                         <td>{{ result.score }}</td>
-                        <td>{{ result.test.unit or '' }}</td>
+                        <td>{{ result.goal or '-' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Set Goal - {{ result.test.test_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="card shadow-sm p-4">
+        <h3>Set Goal for {{ result.test.test_name }}</h3>
+        <p class="text-muted">Player: {{ result.player.first_name }} {{ result.player.last_name }}</p>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label for="goal" class="form-label">Goal Value</label>
+                <input type="number" step="any" class="form-control" id="goal" name="goal" 
+                       value="{{ result.goal if result.goal else '' }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Goal</button>
+            <a href="{{ url_for('player_profile', player_id=result.player_id) }}" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>
